@@ -1,65 +1,83 @@
 // jose-g315 
 // logic and dom manipulation for the game
 
-function createGrid(array) {
-    const gameBoard = document.querySelector(".game-board");
-    let xTurn = true;
+displayController = (function () {
+
+    function createGrid(array) {
+        const gameBoard = document.querySelector(".game-board");
+        let xTurn = true;
+        
+        array.forEach((element,index) => {
+            const tile = document.createElement("div");
+            tile.classList.add("tile");
+            tile.addEventListener("click", () => {
+                xTurn = populateGrid(tile, xTurn, array, index);
+                console.table(array);
+                ticTacToe.playGame(array);
+            });
+            gameBoard.append(tile);
     
-    array.forEach((element,index) => {
-        const tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.addEventListener("click", () => {
-            xTurn = populateGrid(tile, xTurn, array, index);
-            //console.log(index)
-            //console.table(array);
-            ticTacToe.playGame(array);
+    
+            // creating grid lines programmatically 
+            if (index === 0 || index === 1 || index === 3 || index === 4) {
+                tile.classList.add("bottom-right");
+            } else if (index === 2 || index === 5) {
+                tile.classList.add("bottom");
+            } else if (index === 6 || index === 7) {
+                tile.classList.add("right");
+            }
         });
-        gameBoard.append(tile);
-
-
-        // creating grid lines programmatically 
-        if (index === 0 || index === 1 || index === 3 || index === 4) {
-            tile.classList.add("bottom-right");
-        } else if (index === 2 || index === 5) {
-            tile.classList.add("bottom");
-        } else if (index === 6 || index === 7) {
-            tile.classList.add("right");
-        }
-    });
-}
-
-function populateGrid(tile, turn, array, index) {
-    if (turn && tile.textContent.length === 0) {
-        tile.textContent = "X";
-        array.splice(index, 1, 1);
-        console.log(turn + "1");
-        turn = false;
-        console.log(turn + "1");
-        return turn;
-    } else if (!turn && tile.textContent.length === 0) {
-        tile.textContent = "O";
-        array.splice(index, 1, 0);
-        console.log(turn + "2");
-        turn = true;
-        console.log(turn + "2");
-        return turn;
-    } else {
-        return turn;
     }
-}
+    
+    function populateGrid(tile, turn, array, index) {
+        if (turn && tile.textContent.length === 0) {
+            tile.textContent = "X";
+            array.splice(index, 1, 1);
+            turn = false;
+            return turn;
+        } else if (!turn && tile.textContent.length === 0) {
+            tile.textContent = "O";
+            array.splice(index, 1, 0);
+            turn = true;
+            return turn;
+        } else {
+            return turn;
+        }
+    }
 
-gameBoard = (function() {
-    // game board array
-    let board = [
+    function resetGrid(array) {
+        const resetButton = document.querySelector(".reset-button");
+        resetButton.addEventListener("click", () => {
+            array.forEach((element, index, array) => {
+                const tile = document.querySelector(".tile");
+                tile.remove();
+                array[index] = 5;
+                
+            });
+            console.table(array);
+            createGrid(array);
+        })
+        
+    }
+
+    return {
+        createGrid, resetGrid
+    }
+
+}) ();
+
+
+gameGrid = (function() {
+    // game board array initialized with 5s
+    let grid = [
         5,5,5,
         5,5,5,
         5,5,5
     ];
     return {
-        board
+        grid
     }
 })();
-createGrid(gameBoard.board);
 
 ticTacToe = (function () {
     /*  using numbers instead of strings to play the game
@@ -67,12 +85,12 @@ ticTacToe = (function () {
         the winner is determined by finding the sum each row, columns, and diagonal
         sum of 3 means X wins and sum of 0 mean O wins  */
 
-    function checkRow(board) {
+    function checkRow(array) {
         let index = 0;
         // checking sum of each row, each loop checks the next row 
         // then returning 3 for X as the winner and 0 for O as the winner
         for (i = 0; i < 3; i++) {
-            let rowSum = board[index] + board[index + 1] + board[index + 2];
+            let rowSum = array[index] + array[index + 1] + array[index + 2];
             index = index + 3;
             if (rowSum === 3) {
                 console.log(rowSum);
@@ -83,27 +101,27 @@ ticTacToe = (function () {
             }
         }
     }
-    function checkColumn(board) {
+    function checkColumn(array) {
         let index = 0;
         // checking sum of each column, each loop checks the next row 
         // then returning 3 for X as the winner and 0 for O as the winner
         for (i = 0; i < 3; i++) {
-            let columnSum = board[index] + board[index + 3] + board[index + 6];
+            let columnSum = array[index] + array[index + 3] + array[index + 6];
             index = index + 1;
             if (columnSum === 3) {
                 console.log(columnSum);
-                return 3;
+                return columnSum;
             } else if (columnSum === 0) {
                 console.log(columnSum);
                 return 0;
             }
         }    
     }
-    function checkDiagonal(board) {
+    function checkDiagonal(array) {
         // checking sum of each diagonal 
         // then returning 3 for X as the winner and 1 for O as the winner
-        let diagonalOneSum = board[0] + board[4] + board[8];
-        let diagonalTwoSum = board[2] + board[4] + board[6];
+        let diagonalOneSum = array[0] + array[4] + array[8];
+        let diagonalTwoSum = array[2] + array[4] + array[6];
         if (diagonalOneSum === 3 || diagonalTwoSum === 3) {
             console.log("diagonal One " + diagonalOneSum);
             console.log("diagonal Two " + diagonalTwoSum);        
@@ -114,12 +132,15 @@ ticTacToe = (function () {
             return 0;
         }
     }
-    function playGame(board) {
+    function playGame(array) {
         // calling all method to determine winner 
-        if (checkRow(board) === 3 || checkColumn(board) === 3 || checkDiagonal(board) === 3){
+        if (checkRow(array) === 3 || checkColumn(array) === 3 || checkDiagonal(array) === 3){
             console.log("X is Winner");
-        } else if (checkRow(board) === 0 || checkColumn(board) === 0 || checkDiagonal(board) === 0) {
+        } else if (checkRow(array) === 0 || checkColumn(array) === 0 || checkDiagonal(array) === 0) {
             console.log("O is Winner");
+        } else if (!array.includes(5)) {
+            // if there are no winners and 5's from the initial array then a tie has occurred
+            console.log("Tie");
         } else {
             console.log("Game In Progress");
         }
@@ -129,5 +150,8 @@ ticTacToe = (function () {
         playGame
     }
 })();
+
+displayController.createGrid(gameGrid.grid);
+displayController.resetGrid(gameGrid.grid);
 
 //ticTacToe.playGame(gameBoard.board);

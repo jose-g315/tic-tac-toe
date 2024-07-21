@@ -60,24 +60,32 @@ displayController = (function () {
         
     }
 
+    function createPlayers() {
+        const dialog = document.querySelector("dialog");
+        const playerOneName = document.querySelector(".player-one-name");
+        const playerOneScore = document.querySelector(".player-one-score");
+        const playerTwoName = document.querySelector(".player-two-name");
+        const playerTwoScore = document.querySelector(".player-two-score");
+        const addPlayerButton = document.querySelector(".add-players");
+        dialog.showModal();
+        addPlayerButton.addEventListener("click", () => {
+            let playerOne = createPlayer(document.querySelector("#playerOne").value);
+            let playerTwo = createPlayer(document.querySelector("#playerTwo").value);
+            playerOneName.textContent = playerOne.player;
+            playerOneScore.textContent = playerOne.getScore();
+            playerTwoName.textContent = playerTwo.player;
+            playerTwoScore.textContent = playerTwo.getScore();
+        });
+
+
+    }
+
+
     return {
-        createGrid, resetGrid
+        createGrid, resetGrid, createPlayers
     }
 
 }) ();
-
-
-gameGrid = (function() {
-    // game board array initialized with 5s
-    let grid = [
-        5,5,5,
-        5,5,5,
-        5,5,5
-    ];
-    return {
-        grid
-    }
-})();
 
 ticTacToe = (function () {
     /*  using numbers instead of strings to play the game
@@ -110,7 +118,7 @@ ticTacToe = (function () {
             index = index + 1;
             if (columnSum === 3) {
                 console.log(columnSum);
-                return columnSum;
+                return 3;
             } else if (columnSum === 0) {
                 console.log(columnSum);
                 return 0;
@@ -145,12 +153,36 @@ ticTacToe = (function () {
             console.log("Game In Progress");
         }
     }
-
     return {
         playGame
     }
 })();
 
+
+gameGrid = (function() {
+    // game board array initialized with 5s
+    let grid = [
+        5,5,5,
+        5,5,5,
+        5,5,5
+    ];
+    return {
+        grid
+    }
+})();
+
+// factory function to create players
+function createPlayer(name){
+    const player = "Player: " + name;
+    const score = 0;
+    const getScore = () => score;
+    const increaseScore = () => score++;
+    return {
+        player, score, getScore, increaseScore
+    }
+}
+
+displayController.createPlayers();
 displayController.createGrid(gameGrid.grid);
 displayController.resetGrid(gameGrid.grid);
 

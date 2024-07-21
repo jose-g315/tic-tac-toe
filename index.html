@@ -7,9 +7,34 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div><button class="reset-button">Reset</button></div>
+    <dialog>
+        <div class="dialog-div">
+            <h1 class="heading">Tic-Tac-Toe!</h1>
+            <h2 class="heading">Instructions:</h2>
+            <p class="heading">X Goes First</p>
+            <form method="dialog">
+                <label for="playerOne">Player One:</label>
+                <input type="text" name="playerOne" id="playerOne">
+                <label for="playerOne">Player Two:</label>
+                <input type="text" name="playerTwo" id="playerTwo">
+                <button class="add-players">Lets Play!</button>
+            </form>
+        </div>
+    </dialog>
+    <div class="controls">
+        <button class="reset-button">Reset</button>
+        <button class="new-game-button">New Game</button>
+    </div>
     <div class="container">
+        <div class="player-card">
+            <p class="player-one-name"></p>
+            <p class="player-one-score"></p>
+        </div>
         <div class="game-board"></div>
+        <div class="player-card">
+            <p class="player-two-name"></p>
+            <p class="player-two-score"></p>
+        </div>
     </div>
     <script src="main.js"></script>
 </body>

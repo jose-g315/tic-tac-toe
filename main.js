@@ -3,17 +3,30 @@
 
 displayController = (function () {
 
+    let playerOne;
+    let playerTwo;
+    const playerOneName = document.querySelector(".player-one-name");
+    const playerOneScore = document.querySelector(".player-one-score");
+    const playerTwoName = document.querySelector(".player-two-name");
+    const playerTwoScore = document.querySelector(".player-two-score");
+
     function createGrid(array) {
         const gameBoard = document.querySelector(".game-board");
         let xTurn = true;
+        let gameOver = false;
         
         array.forEach((element,index) => {
             const tile = document.createElement("div");
             tile.classList.add("tile");
             tile.addEventListener("click", () => {
                 xTurn = populateGrid(tile, xTurn, array, index);
-                console.table(array);
-                ticTacToe.playGame(array);
+                //console.table(array);
+                let winner = ticTacToe.playGame(array);
+                if (!gameOver && (winner === 3 || winner === 0)) {
+                    updateScore(winner);
+                    gameOver = true;
+                }
+                
             });
             gameBoard.append(tile);
     
@@ -62,21 +75,32 @@ displayController = (function () {
 
     function createPlayers() {
         const dialog = document.querySelector("dialog");
-        const playerOneName = document.querySelector(".player-one-name");
-        const playerOneScore = document.querySelector(".player-one-score");
-        const playerTwoName = document.querySelector(".player-two-name");
-        const playerTwoScore = document.querySelector(".player-two-score");
         const addPlayerButton = document.querySelector(".add-players");
         dialog.showModal();
         addPlayerButton.addEventListener("click", () => {
-            let playerOne = createPlayer(document.querySelector("#playerOne").value);
-            let playerTwo = createPlayer(document.querySelector("#playerTwo").value);
-            playerOneName.textContent = playerOne.player;
-            playerOneScore.textContent = playerOne.getScore();
-            playerTwoName.textContent = playerTwo.player;
-            playerTwoScore.textContent = playerTwo.getScore();
+            playerOne = createPlayer(document.querySelector("#playerOne").value);
+            playerOneName.textContent = playerOne.playerName;
+            playerTwo = createPlayer(document.querySelector("#playerTwo").value);
+            playerTwoName.textContent = playerTwo.playerName;
+            displayScores()
         });
+    }
 
+    function displayScores() {
+        playerOneScore.textContent = playerOne.getScore();
+        playerTwoScore.textContent = playerTwo.getScore();
+    }
+
+    function updateScore(winner) {
+        if (winner === 3) {
+            playerOne.increaseScore();
+            displayScores();
+        } else if (winner === 0) {
+            playerTwo.increaseScore();
+            displayScores();
+        }
+    }
+    function stopPlay(gameOver,winner) {
 
     }
 
@@ -144,8 +168,10 @@ ticTacToe = (function () {
         // calling all method to determine winner 
         if (checkRow(array) === 3 || checkColumn(array) === 3 || checkDiagonal(array) === 3){
             console.log("X is Winner");
+            return 3;
         } else if (checkRow(array) === 0 || checkColumn(array) === 0 || checkDiagonal(array) === 0) {
             console.log("O is Winner");
+            return 0;
         } else if (!array.includes(5)) {
             // if there are no winners and 5's from the initial array then a tie has occurred
             console.log("Tie");
@@ -173,12 +199,12 @@ gameGrid = (function() {
 
 // factory function to create players
 function createPlayer(name){
-    const player = "Player: " + name;
-    const score = 0;
+    const playerName = "Player: " + name;
+    let score = 0;
     const getScore = () => score;
     const increaseScore = () => score++;
     return {
-        player, score, getScore, increaseScore
+        playerName, score, getScore, increaseScore
     }
 }
 

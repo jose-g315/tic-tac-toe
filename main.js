@@ -9,6 +9,10 @@ displayController = (function () {
     const playerOneScore = document.querySelector(".player-one-score");
     const playerTwoName = document.querySelector(".player-two-name");
     const playerTwoScore = document.querySelector(".player-two-score");
+    const dialog = document.querySelector("dialog");
+    const addPlayerButton = document.querySelector(".add-players");
+    const newGameButton = document.querySelector(".new-game-button");
+            const resetButton = document.querySelector(".reset-button");
 
     function createGrid(array) {
         const gameBoard = document.querySelector(".game-board");
@@ -20,7 +24,6 @@ displayController = (function () {
             tile.classList.add("tile");
             tile.addEventListener("click", () => {
                 xTurn = populateGrid(tile, xTurn, array, index);
-                //console.table(array);
                 let winner = ticTacToe.playGame(array);
                 if (!gameOver && (winner === 3 || winner === 0)) {
                     updateScore(winner);
@@ -59,23 +62,23 @@ displayController = (function () {
     }
 
     function resetGrid(array) {
-        const resetButton = document.querySelector(".reset-button");
         resetButton.addEventListener("click", () => {
-            array.forEach((element, index, array) => {
-                const tile = document.querySelector(".tile");
-                tile.remove();
-                array[index] = 5;
-                
-            });
-            console.table(array);
-            createGrid(array);
+            reset(array);
         })
         
     }
+    function reset(array){
+        array.forEach((element, index, array) => {
+            const tile = document.querySelector(".tile");
+            tile.remove();
+            array[index] = 5;
+            
+        });
+        console.table(array);
+        createGrid(array);
+    }
 
     function createPlayers() {
-        const dialog = document.querySelector("dialog");
-        const addPlayerButton = document.querySelector(".add-players");
         dialog.showModal();
         addPlayerButton.addEventListener("click", () => {
             playerOne = createPlayer(document.querySelector("#playerOne").value);
@@ -83,6 +86,8 @@ displayController = (function () {
             playerTwo = createPlayer(document.querySelector("#playerTwo").value);
             playerTwoName.textContent = playerTwo.playerName;
             displayScores()
+            // resetting form
+            document.querySelector("form").reset();
         });
     }
 
@@ -100,13 +105,16 @@ displayController = (function () {
             displayScores();
         }
     }
-    function stopPlay(gameOver,winner) {
 
+    function startNewGame(array) {
+        newGameButton.addEventListener("click", () => {
+            createPlayers(array);
+            reset(array);
+        });
     }
-
-
+    
     return {
-        createGrid, resetGrid, createPlayers
+        createGrid, resetGrid, createPlayers, startNewGame
     }
 
 }) ();
@@ -204,12 +212,13 @@ function createPlayer(name){
     const getScore = () => score;
     const increaseScore = () => score++;
     return {
-        playerName, score, getScore, increaseScore
+        playerName, getScore, increaseScore
     }
 }
 
 displayController.createPlayers();
 displayController.createGrid(gameGrid.grid);
 displayController.resetGrid(gameGrid.grid);
+displayController.startNewGame(gameGrid.grid);
 
 //ticTacToe.playGame(gameBoard.board);

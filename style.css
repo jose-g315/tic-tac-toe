@@ -59,6 +59,9 @@ form {
 }
 .tile {
     background-color: aquamarine;
+    font-size: 3rem;
+    text-align: center;
+    padding-top: 65px;
 }
 .bottom-right {
     border-right: 10px solid black;

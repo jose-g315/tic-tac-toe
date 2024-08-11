@@ -1,7 +1,7 @@
 // jose-g315 
 // logic and dom manipulation for the game
 
-displayController = (function () {
+displayController = (function (array) {
 
     let playerOne;
     let playerTwo;
@@ -12,7 +12,8 @@ displayController = (function () {
     const dialog = document.querySelector("dialog");
     const addPlayerButton = document.querySelector(".add-players");
     const newGameButton = document.querySelector(".new-game-button");
-            const resetButton = document.querySelector(".reset-button");
+    const resetButton = document.querySelector(".reset-button");
+    const winnerDisplay = document.querySelector(".winner-display");
 
     function createGrid(array) {
         const gameBoard = document.querySelector(".game-board");
@@ -24,6 +25,7 @@ displayController = (function () {
             tile.classList.add("tile");
             tile.addEventListener("click", () => {
                 xTurn = populateGrid(tile, xTurn, array, index);
+                displayTurn(xTurn);
                 let winner = ticTacToe.playGame(array);
                 if (!gameOver && (winner === 3 || winner === 0)) {
                     updateScore(winner);
@@ -45,6 +47,17 @@ displayController = (function () {
         });
     }
     
+    function displayTurn(turn) {
+        if (turn) {
+            playerOneName.classList.add("turn");
+            playerTwoName.classList.remove("turn");
+        } else if (!turn) {
+            playerTwoName.classList.add("turn");
+            playerOneName.classList.remove("turn");
+        }
+        
+    }
+
     function populateGrid(tile, turn, array, index) {
         if (turn && tile.textContent.length === 0) {
             tile.textContent = "X";
@@ -74,41 +87,50 @@ displayController = (function () {
             array[index] = 5;
             
         });
-        console.table(array);
         createGrid(array);
+        winnerDisplay.textContent = "";
     }
 
     function createPlayers() {
         dialog.showModal();
         addPlayerButton.addEventListener("click", () => {
             playerOne = createPlayer(document.querySelector("#playerOne").value);
+            console.log(playerOne);
             playerOneName.textContent = playerOne.playerName;
+            playerOneName.classList.add("player-name");
+            playerOneName.classList.add("turn");
             playerTwo = createPlayer(document.querySelector("#playerTwo").value);
+            console.log(playerTwo);
             playerTwoName.textContent = playerTwo.playerName;
+            playerTwoName.classList.add("player-name");
             displayScores()
-            // resetting form
-            document.querySelector("form").reset();
         });
+        // resetting form
+        document.querySelector("form").reset();
     }
 
     function displayScores() {
         playerOneScore.textContent = playerOne.getScore();
+        playerOneScore.classList.add("player-score");
         playerTwoScore.textContent = playerTwo.getScore();
+        playerTwoScore.classList.add("player-score");
     }
 
     function updateScore(winner) {
         if (winner === 3) {
             playerOne.increaseScore();
             displayScores();
+            winnerDisplay.textContent = playerOne.playerName;
         } else if (winner === 0) {
             playerTwo.increaseScore();
             displayScores();
-        }
+            winnerDisplay.textContent = playerTwo.playerName;
+        } 
     }
 
     function startNewGame(array) {
         newGameButton.addEventListener("click", () => {
-            createPlayers(array);
+            createPlayers();
             reset(array);
         });
     }
@@ -183,6 +205,7 @@ ticTacToe = (function () {
         } else if (!array.includes(5)) {
             // if there are no winners and 5's from the initial array then a tie has occurred
             console.log("Tie");
+            return 2;  
         } else {
             console.log("Game In Progress");
         }
@@ -207,7 +230,7 @@ gameGrid = (function() {
 
 // factory function to create players
 function createPlayer(name){
-    const playerName = "Player: " + name;
+    const playerName = name;
     let score = 0;
     const getScore = () => score;
     const increaseScore = () => score++;

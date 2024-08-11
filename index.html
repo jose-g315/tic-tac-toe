@@ -9,21 +9,27 @@
 <body>
     <dialog>
         <div class="dialog-div">
-            <h1 class="heading">Tic-Tac-Toe!</h1>
-            <h2 class="heading">Instructions:</h2>
-            <p class="heading">X Goes First</p>
+            <h1 class="heading one">Tic-Tac-Toe!</h1>
+            <h2 class="heading two">Instructions:</h2>
+            <p class="heading three">X Goes First</p>
             <form method="dialog">
-                <label for="playerOne">Player One:</label>
+                <label for="playerOne">Player One (X):</label>
                 <input type="text" name="playerOne" id="playerOne">
-                <label for="playerOne">Player Two:</label>
+                <br>
+                <br>
+                <label for="playerOne">Player Two (O):</label>
                 <input type="text" name="playerTwo" id="playerTwo">
+                <br>
+                <br>
                 <button class="add-players">Lets Play!</button>
             </form>
         </div>
     </dialog>
     <div class="controls">
-        <button class="reset-button reset">Reset</button>
-        <button class="new-game-button reset">New Game</button>
+        <h1 class="winner-heading">Winner:</h1>
+        <div class="winner-display"></div>
+        <button class="reset-button control-button">Reset</button>
+        <button class="new-game-button control-button">New Game</button>
     </div>
     <div class="container">
         <div class="player-card">

@@ -1,8 +1,10 @@
 // jose-g315 
 // logic and dom manipulation for the game
 
-displayController = (function (array) {
+// IIFE that controls the display of the game
+displayController = (function () {
 
+    // global function variables
     let playerOne;
     let playerTwo;
     const playerOneName = document.querySelector(".player-one-name");
@@ -20,21 +22,23 @@ displayController = (function (array) {
         let xTurn = true;
         let gameOver = false;
         
+        // creating a tile for each element in the game grid array
         array.forEach((element,index) => {
             const tile = document.createElement("div");
+            // adding class and event listener
             tile.classList.add("tile");
             tile.addEventListener("click", () => {
                 xTurn = populateGrid(tile, xTurn, array, index);
                 displayTurn(xTurn);
+                // determining winner based on game logic IIFE
                 let winner = ticTacToe.playGame(array);
-                if (!gameOver && (winner === 3 || winner === 0)) {
+                if (!gameOver && (winner === 3 || winner === 0 || winner === 2)) {
                     updateScore(winner);
                     gameOver = true;
                 }
                 
             });
             gameBoard.append(tile);
-    
     
             // creating grid lines programmatically 
             if (index === 0 || index === 1 || index === 3 || index === 4) {
@@ -47,6 +51,7 @@ displayController = (function (array) {
         });
     }
     
+    // highlights whose turn it is by adding and removing a css class
     function displayTurn(turn) {
         if (turn) {
             playerOneName.classList.add("turn");
@@ -57,8 +62,10 @@ displayController = (function (array) {
         }
         
     }
-
+    
+    // populating the grid with X or O based on turn value
     function populateGrid(tile, turn, array, index) {
+        // turn value gets inverted and returned
         if (turn && tile.textContent.length === 0) {
             tile.textContent = "X";
             array.splice(index, 1, 1);
@@ -77,8 +84,7 @@ displayController = (function (array) {
     function resetGrid(array) {
         resetButton.addEventListener("click", () => {
             reset(array);
-        })
-        
+        })  
     }
     function reset(array){
         array.forEach((element, index, array) => {
@@ -94,6 +100,7 @@ displayController = (function (array) {
     function createPlayers() {
         dialog.showModal();
         addPlayerButton.addEventListener("click", () => {
+            // creating new players using the factory function and adding appropriate classes and text content
             playerOne = createPlayer(document.querySelector("#playerOne").value);
             console.log(playerOne);
             playerOneName.textContent = playerOne.playerName;
@@ -125,7 +132,9 @@ displayController = (function (array) {
             playerTwo.increaseScore();
             displayScores();
             winnerDisplay.textContent = playerTwo.playerName;
-        } 
+        } else if (winner === 2) {
+            winnerDisplay.textContent = "Tie!"
+        }
     }
 
     function startNewGame(array) {
@@ -134,13 +143,20 @@ displayController = (function (array) {
             reset(array);
         });
     }
+    function gameFlow(array) {
+        createPlayers();
+        createGrid(array);
+        resetGrid(array);
+        startNewGame(array);
+    }
     
     return {
-        createGrid, resetGrid, createPlayers, startNewGame
+        gameFlow
     }
 
 }) ();
 
+// IIFE that handles the game logic 
 ticTacToe = (function () {
     /*  using numbers instead of strings to play the game
         X's are represented by ones and O's by zeros 
@@ -155,10 +171,8 @@ ticTacToe = (function () {
             let rowSum = array[index] + array[index + 1] + array[index + 2];
             index = index + 3;
             if (rowSum === 3) {
-                console.log(rowSum);
                 return 3;
             } else if (rowSum === 0) {
-                console.log(rowSum);
                 return 0;
             }
         }
@@ -171,10 +185,8 @@ ticTacToe = (function () {
             let columnSum = array[index] + array[index + 3] + array[index + 6];
             index = index + 1;
             if (columnSum === 3) {
-                console.log(columnSum);
                 return 3;
             } else if (columnSum === 0) {
-                console.log(columnSum);
                 return 0;
             }
         }    
@@ -184,38 +196,29 @@ ticTacToe = (function () {
         // then returning 3 for X as the winner and 1 for O as the winner
         let diagonalOneSum = array[0] + array[4] + array[8];
         let diagonalTwoSum = array[2] + array[4] + array[6];
-        if (diagonalOneSum === 3 || diagonalTwoSum === 3) {
-            console.log("diagonal One " + diagonalOneSum);
-            console.log("diagonal Two " + diagonalTwoSum);        
+        if (diagonalOneSum === 3 || diagonalTwoSum === 3) {        
             return 3;
-        } else if (diagonalOneSum === 0 || diagonalTwoSum === 0) {
-            console.log("diagonal One " + diagonalOneSum);
-            console.log("diagonal Two " + diagonalTwoSum); 
+        } else if (diagonalOneSum === 0 || diagonalTwoSum === 0) { 
             return 0;
         }
     }
     function playGame(array) {
         // calling all method to determine winner 
         if (checkRow(array) === 3 || checkColumn(array) === 3 || checkDiagonal(array) === 3){
-            console.log("X is Winner");
             return 3;
         } else if (checkRow(array) === 0 || checkColumn(array) === 0 || checkDiagonal(array) === 0) {
-            console.log("O is Winner");
             return 0;
         } else if (!array.includes(5)) {
             // if there are no winners and 5's from the initial array then a tie has occurred
-            console.log("Tie");
             return 2;  
-        } else {
-            console.log("Game In Progress");
-        }
+        } 
     }
     return {
         playGame
     }
 })();
 
-
+// IIFE for the game grid
 gameGrid = (function() {
     // game board array initialized with 5s
     let grid = [
@@ -239,9 +242,4 @@ function createPlayer(name){
     }
 }
 
-displayController.createPlayers();
-displayController.createGrid(gameGrid.grid);
-displayController.resetGrid(gameGrid.grid);
-displayController.startNewGame(gameGrid.grid);
-
-//ticTacToe.playGame(gameBoard.board);
+displayController.gameFlow(gameGrid.grid);
